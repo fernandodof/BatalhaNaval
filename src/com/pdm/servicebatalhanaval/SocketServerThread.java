@@ -19,15 +19,13 @@ public class SocketServerThread extends AsyncTask<Void, Void, Void> {
 	private TextView response;
 	private String message = "";
 	private static ServerSocket serverSocket = null;
-	private Context context;
+	public static Context context;
 	private static boolean gameStarted = false;
-	private GameManager gameManager;
+
 	private static final int PORT = 8090;
 	private static Socket socket;
-
 	public SocketServerThread(Context context) {
 		this.context = context;
-		this.gameManager = new GameManager();
 	}
 
 	@Override
@@ -39,20 +37,26 @@ public class SocketServerThread extends AsyncTask<Void, Void, Void> {
 				socket = serverSocket.accept();
 				InputStreamReader inputStreamReader = new InputStreamReader(socket.getInputStream());
 				BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
-
 				String msgReceived = bufferedReader.readLine();
+				
 				Log.i("Msg received on server", msgReceived);
-
-				String response = "ok from server";
-
-				MainActivity mainActivity = (MainActivity) context;
-				mainActivity.updateMsg(response);
-
+				
+				String response = "ok";
+				if(!gameStarted){
+					gameStarted = true;
+				}else{
+					String[] parts = msgReceived.split("@");
+					Game game = (Game) context;
+					if(parts[0].equalsIgnoreCase("-g")){
+						response = game.atirar(Integer.parseInt(parts[1]),Integer.parseInt(parts[2]));
+					}
+				}
+				
+				
 				PrintWriter printWriter = new PrintWriter(socket.getOutputStream());
 				printWriter.println(response);
 				printWriter.flush();
-
-				
+			
 			}
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
@@ -60,7 +64,8 @@ public class SocketServerThread extends AsyncTask<Void, Void, Void> {
 		}
 		return null;
 	}
-
+	
+	
 	public String getMsg() {
 		return msg;
 	}
@@ -73,8 +78,8 @@ public class SocketServerThread extends AsyncTask<Void, Void, Void> {
 		return context;
 	}
 
-	public void setContext(Context context) {
-		this.context = context;
+	public static void setContext(Context context) {
+		SocketServerThread.context = context;
 	}
 
 }

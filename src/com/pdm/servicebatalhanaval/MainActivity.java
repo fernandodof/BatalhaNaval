@@ -6,6 +6,7 @@ import java.net.SocketException;
 import java.util.Enumeration;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
@@ -19,13 +20,13 @@ import com.example.servicebatalhanaval.R;
 
 public class MainActivity extends Activity {
 
-
 	private static TextView textResponse;
 	private EditText editTextAddress;
 	private EditText editTextPort;
 	Button buttonConnect, buttonClear;
 	private boolean turn = true;
-	
+	private Context context;
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -36,7 +37,8 @@ public class MainActivity extends Activity {
 		buttonConnect = (Button) findViewById(R.id.connect);
 		textResponse = (TextView) findViewById(R.id.response);
 		buttonConnect.setOnClickListener(buttonConnectOnClickListener);
-		
+		this.context = MainActivity.this;
+
 		SocketServerThread serverThread = new SocketServerThread(MainActivity.this);
 		serverThread.execute();
 		Log.i("IP LOCAL: ", getIpAddress());
@@ -47,27 +49,35 @@ public class MainActivity extends Activity {
 
 		@Override
 		public void onClick(View arg0) {
-			Log.i("Debug button", "connect button clicked "+ editTextAddress.getText()+ ":"+ editTextPort.getText());
+			Log.i("Debug button",
+					"connect button clicked " + editTextAddress.getText() + ":"
+							+ editTextPort.getText());
 			String msg = null;
-			if(!MyClientTask.connected){
-				msg = "-c@"+editTextAddress.getText()+"@"+editTextPort.getText();
+			if (!MyClientTask.connected) {
+				msg = "-c@" + editTextAddress.getText() + "@"
+						+ editTextPort.getText();
 			}
-			
-			MyClientTask myClientTask = new MyClientTask(MainActivity.this,msg);
+
+			MyClientTask myClientTask = new MyClientTask(MainActivity.this, msg);
 			myClientTask.execute();
 		}
 	};
 
-	public void updateMsg(final String msg){
+	public void updateMsg(final String msg) {
 		MainActivity.this.runOnUiThread(new Runnable() {
-			
+
 			@Override
 			public void run() {
 				textResponse.setText(msg);
+				if (msg.equalsIgnoreCase("ok")) {
+					Intent gameIntent = new Intent(MainActivity.this, Game.class);
+					startActivity(gameIntent);
+				}
 			}
-		});
-	}
 
+		});
+
+	}
 
 	private String getIpAddress() {
 		String ip = "";
