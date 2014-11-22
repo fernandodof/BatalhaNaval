@@ -18,7 +18,7 @@ public class SocketServerThread extends AsyncTask<Void, Void, Void> {
 	private String msg;
 	private TextView response;
 	private String message = "";
-	private static ServerSocket serverSocket = null;
+	public static ServerSocket serverSocket = null;
 	public static Context context;
 	private static boolean gameStarted = false;
 
@@ -76,6 +76,7 @@ public class SocketServerThread extends AsyncTask<Void, Void, Void> {
 	public static void startServer() {
 		try {
 			serverSocket = new ServerSocket(PORT);
+			Log.i("StartServer", "StartServer");
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

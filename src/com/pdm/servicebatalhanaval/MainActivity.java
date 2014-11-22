@@ -4,7 +4,6 @@ import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.net.SocketException;
 import java.util.Enumeration;
-
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
@@ -23,7 +22,8 @@ public class MainActivity extends Activity {
 	private static TextView textResponse;
 	private EditText editTextAddress;
 	private EditText editTextPort;
-	Button buttonConnect, buttonClear;
+	private Button buttonConnect;
+	private Button buttonStart;
 	private boolean turn = true;
 	private Context context;
 
@@ -35,15 +35,20 @@ public class MainActivity extends Activity {
 		editTextAddress = (EditText) findViewById(R.id.address);
 		editTextPort = (EditText) findViewById(R.id.port);
 		buttonConnect = (Button) findViewById(R.id.connect);
+		buttonStart = (Button) findViewById(R.id.startButton);
+		
+		editTextAddress.setEnabled(false);
+		editTextPort.setEnabled(false);
+		buttonConnect.setEnabled(false);
+		
 		textResponse = (TextView) findViewById(R.id.response);
 		buttonConnect.setOnClickListener(buttonConnectOnClickListener);
+		buttonStart.setOnClickListener(buttonStartOnClickListener);
 		this.context = MainActivity.this;
 
-//		startService(new Intent(MainActivity.this, StartBackgroundService.class));
-		
 		SocketServerThread serverThread = new SocketServerThread(MainActivity.this);
 		serverThread.execute();
-	
+
 		
 		Log.i("IP LOCAL: ", getIpAddress());
 		textResponse.setText(getIpAddress());
@@ -66,6 +71,19 @@ public class MainActivity extends Activity {
 			myClientTask.execute();
 		}
 	};
+	
+	
+	OnClickListener buttonStartOnClickListener = new OnClickListener() {
+		
+		@Override
+		public void onClick(View v) {
+//	        startService(new Intent(MainActivity.this, StartBackgroundService.class));
+	  		editTextAddress.setEnabled(true);
+			editTextPort.setEnabled(true);
+			buttonConnect.setEnabled(true);
+		}
+	};
+
 
 	public void updateMsg(final String msg) {
 		MainActivity.this.runOnUiThread(new Runnable() {
@@ -76,6 +94,7 @@ public class MainActivity extends Activity {
 				if (msg.equalsIgnoreCase("ok")) {
 					Intent gameIntent = new Intent(MainActivity.this, Game.class);
 					startActivity(gameIntent);
+					
 				}
 			}
 
