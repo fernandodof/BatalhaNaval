@@ -39,8 +39,12 @@ public class MainActivity extends Activity {
 		buttonConnect.setOnClickListener(buttonConnectOnClickListener);
 		this.context = MainActivity.this;
 
+//		startService(new Intent(MainActivity.this, StartBackgroundService.class));
+		
 		SocketServerThread serverThread = new SocketServerThread(MainActivity.this);
 		serverThread.execute();
+	
+		
 		Log.i("IP LOCAL: ", getIpAddress());
 		textResponse.setText(getIpAddress());
 	}

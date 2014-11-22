@@ -28,6 +28,8 @@
             android:name="com.pdm.servicebatalhanaval.Game"
             android:label="@string/title_activity_game" >
         </activity>
+        
+        <service android:name=".StartBackgroundService"></service>
     </application>
 
 </manifest>

@@ -24,8 +24,9 @@ public class SocketServerThread extends AsyncTask<Void, Void, Void> {
 
 	private static final int PORT = 8090;
 	private static Socket socket;
+
 	public SocketServerThread(Context context) {
-		this.context = context;
+		SocketServerThread.context = context;
 	}
 
 	@Override
@@ -35,28 +36,35 @@ public class SocketServerThread extends AsyncTask<Void, Void, Void> {
 
 			while (true) {
 				socket = serverSocket.accept();
-				InputStreamReader inputStreamReader = new InputStreamReader(socket.getInputStream());
-				BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
+				InputStreamReader inputStreamReader = new InputStreamReader(
+						socket.getInputStream());
+				BufferedReader bufferedReader = new BufferedReader(
+						inputStreamReader);
 				String msgReceived = bufferedReader.readLine();
-				
+
 				Log.i("Msg received on server", msgReceived);
-				
+
 				String response = "ok";
-				if(!gameStarted){
+				if (!gameStarted) {
 					gameStarted = true;
-				}else{
+				} else {
 					String[] parts = msgReceived.split("@");
 					Game game = (Game) context;
-					if(parts[0].equalsIgnoreCase("-g")){
-						response = game.atirar(Integer.parseInt(parts[1]),Integer.parseInt(parts[2]));
+					if (parts[0].equalsIgnoreCase("-g")) {
+						response = game.atirar(Integer.parseInt(parts[1]), Integer.parseInt(parts[2]));
+						response = "-p@" + response;
+					}
+					
+					if(response.split("@").length>2){
+						game.removeControls();
+						game.setResponse(":-( Você perdeu");
 					}
 				}
-				
-				
+
 				PrintWriter printWriter = new PrintWriter(socket.getOutputStream());
 				printWriter.println(response);
 				printWriter.flush();
-			
+
 			}
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
@@ -64,8 +72,16 @@ public class SocketServerThread extends AsyncTask<Void, Void, Void> {
 		}
 		return null;
 	}
-	
-	
+
+	public static void startServer() {
+		try {
+			serverSocket = new ServerSocket(PORT);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+
 	public String getMsg() {
 		return msg;
 	}
