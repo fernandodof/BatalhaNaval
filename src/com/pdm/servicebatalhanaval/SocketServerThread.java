@@ -20,7 +20,7 @@ public class SocketServerThread extends AsyncTask<Void, Void, Void> {
 	private String message = "";
 	public static ServerSocket serverSocket = null;
 	public static Context context;
-	private static boolean gameStarted = false;
+	public static boolean gameStarted = false;
 
 	private static final int PORT = 8090;
 	private static Socket socket;
@@ -47,6 +47,10 @@ public class SocketServerThread extends AsyncTask<Void, Void, Void> {
 				String response = "ok";
 				if (!gameStarted) {
 					gameStarted = true;
+					if(Game.isTurn()){
+						response = "okT";
+					}
+					
 				} else {
 					String[] parts = msgReceived.split("@");
 					Game game = (Game) context;

@@ -24,7 +24,7 @@ public class MainActivity extends Activity {
 	private EditText editTextPort;
 	private Button buttonConnect;
 	private Button buttonStart;
-	private boolean turn = true;
+	public static boolean turn = true;
 	private Context context;
 
 	@Override
@@ -91,10 +91,13 @@ public class MainActivity extends Activity {
 			@Override
 			public void run() {
 				textResponse.setText(msg);
-				if (msg.equalsIgnoreCase("ok")) {
+				if (msg.startsWith("ok")) {
 					Intent gameIntent = new Intent(MainActivity.this, Game.class);
 					startActivity(gameIntent);
-					
+					if(msg.equalsIgnoreCase("okT")){
+						Game.setTurn(false);
+						MainActivity.turn = false;
+					}
 				}
 			}
 
