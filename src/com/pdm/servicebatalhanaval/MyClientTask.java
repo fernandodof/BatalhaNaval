@@ -11,64 +11,52 @@ import android.content.Context;
 import android.os.AsyncTask;
 import android.util.Log;
 
+import com.pdm.activities.Game;
+
 public class MyClientTask extends AsyncTask<Void, Void, Void> {
+	private final String TAG = "FireActionTask";
 	private final Context context;
-	private static String ip =null;
-	private static int port;
+	private String ip = null;
+	private int port;
 	String response = "";
 	public static boolean connected = false;
-	private String[] msgArray;
 	private String msg;
-	public static Socket socket = null;
-	
-	public MyClientTask(Context context, String msg) {
+
+	public MyClientTask(Context context, String host, int port, String msg) {
 		this.context = context;
 		this.msg = msg;
-		this.msgArray = msg.split("@");
-		if (msgArray[0].equalsIgnoreCase("-c")) {
-			MyClientTask.ip = msgArray[1];
-			MyClientTask.port = Integer.parseInt(msgArray[2]);
-		}
+		this.ip = host;
+		this.port = port;
 	}
 
 	@Override
 	protected Void doInBackground(Void... arg0) {
 
 		try {
-			MyClientTask.socket = new Socket(ip, port);
-			
+			Socket socket = new Socket(ip, port);
+			//
 			PrintWriter printWriter = new PrintWriter(socket.getOutputStream());
 			printWriter.println(this.msg);
 			printWriter.flush();
-            Log.i("Degug resquest", this.msg);
+			Log.i("Degug resquest", this.msg);
 
-            BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(MyClientTask.socket.getInputStream()));
-            String response = bufferedReader.readLine();
-            Log.i("Debug response", response);
-
-            if(!context.getClass().getSimpleName().equalsIgnoreCase("Game")){
-            	MainActivity mainActivity = (MainActivity) context;
-				mainActivity.updateMsg(response);
-            }else{
-            	Game game = (Game) context;
-            	game.setResultFromServer(response);
-            }
-			
-			
+			BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+			String response = bufferedReader.readLine();
+			Log.i("Degug resquest", this.msg);
+			Log.i("Debug response", response);
+			//
+			Game game = (Game) context;
+			game.setResultFromServer(response);
+			//
+			socket.close();
 		} catch (UnknownHostException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			Log.e(TAG, "erro ao executar o tiro:", e);
 			response = "UnknownHostException: " + e.toString();
-			MainActivity mainActivity = (MainActivity) context;
-			mainActivity.updateMsg(response);
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			Log.e(TAG, "erro ao executar o tiro:", e);
 			response = "IOException: " + e.toString();
-			MainActivity mainActivity = (MainActivity) context;
-			mainActivity.updateMsg(response);
 		}
 		return null;
 	}
-	
+
 }
